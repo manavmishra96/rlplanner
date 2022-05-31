@@ -31,14 +31,13 @@ UP = 3
 # Modified frozen lake environment
 
 class FrozenLakeEnv(gym.Env):
-    def __init__(self, desc=None, is_slippery=True, slip_ratio = 0.33):
+    def __init__(self, desc = None, slippery = 0.33):
         self.desc = desc = np.asarray(desc, dtype="c")
         self.nrow, self.ncol = nrow, ncol = desc.shape
         self.ndir = ndir = 9
         self.reward_range = (-1, 0)
 
-        if is_slippery:
-            self.probable_slip = slip_ratio
+        self.probable_slip = 1.0 - slippery
 
         nA = 4
         nS = nrow * ncol * ndir
@@ -88,14 +87,11 @@ class FrozenLakeEnv(gym.Env):
                         if letter in b"G":
                             li.append((1.0, s, 0, True))
                         else:
-                            if is_slippery:
-                                li.append((self.probable_slip, *update_probability_matrix(row, col, dir, a)))
-                                for b in [(a - 1) % 4, (a + 1) % 4]:
-                                    li.append(
-                                        (((1.0 - self.probable_slip)/2.0, *update_probability_matrix(row, col, dir, b)))
-                                    )
-                            else:
-                                li.append((1.0, *update_probability_matrix(row, col, dir, a)))
+                            li.append((self.probable_slip, *update_probability_matrix(row, col, dir, a)))
+                            for b in [(a - 1) % 4, (a + 1) % 4]:
+                                li.append(
+                                    (((1.0 - self.probable_slip)/2.0, *update_probability_matrix(row, col, dir, b)))
+                                )
 
         self.observation_space = spaces.Discrete(nS)
         self.action_space = spaces.Discrete(nA)

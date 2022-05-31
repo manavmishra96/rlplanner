@@ -9,6 +9,7 @@ from tqdm import tqdm
 
 from frozenlake import FrozenLakeEnv
 from boxworldgen import WorldSetup
+from params import parameters
 
 DIRECTIONS = {
     0: "here",
@@ -28,10 +29,11 @@ RIGHT = 2
 UP = 3
 
 # env = gym.make("FrozenLake-v1", desc=desc)
+P = parameters()
 box = WorldSetup()
 desc = box.get_map_random()
 
-env = FrozenLakeEnv(desc=desc, slip_ratio=box.slip_ratio)
+env = FrozenLakeEnv(desc=desc, slippery=P.slippery)
 
 action_size = env.action_space.n
 state_size = env.observation_space.n
@@ -56,7 +58,7 @@ epsilon_list = []
 for episode in tqdm(range(total_episodes)):
     desc = box.get_map_random()
 
-    env = FrozenLakeEnv(desc=desc, slip_ratio=0.33)
+    env = FrozenLakeEnv(desc=desc, slippery=P.slippery)
     state = env.reset()
 
     step = 0
@@ -93,5 +95,5 @@ Q_action = [ACTION_MAP[a] for a in action_lst]
 # print("Q* action = \n", Q_action)
 print("\n Training over!")
 
-file = 'models/qtable' + str(int(box.slip_ratio * 100)) + '.npy'
+file = 'models/qtable' + str(int(P.slippery * 100)) + '.npy'
 np.save(file, qtable)
